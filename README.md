@@ -5,54 +5,50 @@ Repository for resume builder app
 ## Project Structure
 
 resume_builder_llm_app/
-├── app.py                            # Main Streamlit entrypoint
-├── requirements.txt                  # Python dependencies
-├── README.md                         # Project documentation
+├── app.py # Streamlit app entrypoint
+├── requirements.txt # Python dependencies
+├── README.md # Project documentation
 
 ├── assets/
-│   └── templates/                    # Resume template files (HTML/DOCX/LaTeX)
-│       ├── modern_template.docx
-│       ├── minimal_template.docx
-│       └── creative_template.html
+│ └── templates/ # Resume templates (HTML/DOCX/LaTeX)
 
 ├── configs/
-│   └── prompts.yaml                  # System/LLM prompt templates
+│ └── prompts.yaml # LLM system & user prompt templates
 
 ├── data/
-│   ├── resumes/                      # Uploaded resumes
-│   ├── linkedin_profiles/           # LinkedIn data (parsed or downloaded)
-│   └── job_descriptions/            # Job Descriptions provided by user
+│ ├── resumes/ # Uploaded resume files
+│ ├── linkedin_profiles/ # Parsed LinkedIn data
+│ └── job_descriptions/ # Uploaded JD files or text
 
 ├── output/
-│   ├── final_resume.pdf             # Generated resume (for download)
-│   └── logs/                        # Error logs, processing reports
+│ ├── final_resume.pdf # Final resume output
+│ └── logs/ # Logs or error reports
 
 ├── src/
-│   ├── __init__.py
-│   ├── ui/
-│   │   ├── layout.py                # Streamlit page structure and layout
-│   │   └── components.py           # Custom widgets (uploaders, forms)
-│   │
-│   ├── parsers/
-│   │   ├── resume_parser.py        # Extracts data from uploaded resumes
-│   │   ├── linkedin_parser.py      # Parses LinkedIn data from URL/PDF
-│   │   └── jd_parser.py            # Extracts information from job descriptions
-│   │
-│   ├── llm/
-│   │   ├── prompt_builder.py       # Builds prompts for the LLM
-│   │   ├── resume_generator.py     # LLM API interaction to generate resume
-│   │   └── scoring.py              # Optional: resume vs JD relevance scoring
-│   │
-│   ├── template_engine/
-│   │   ├── formatter.py            # Formats LLM output for templates
-│   │   └── export.py               # Exports resume to PDF/DOCX
-│   │
-│   └── utils/
-│       ├── file_handler.py         # File saving, reading, etc.
-│       ├── text_cleaner.py         # Text preprocessing and cleaning
-│       └── validator.py            # Validates inputs (URLs, filetypes, etc.)
+│ ├── ui/ # Streamlit UI layout & components
+│ │ ├── layout.py
+│ │ └── components.py
+│ │
+│ ├── parsers/ # Resume, LinkedIn, and JD parsers
+│ │ ├── resume_parser.py
+│ │ ├── linkedin_parser.py
+│ │ └── jd_parser.py
+│ │
+│ ├── llm/ # LLM interaction logic
+│ │ ├── prompt_builder.py
+│ │ ├── resume_generator.py
+│ │ └── scoring.py
+│ │
+│ ├── template_engine/ # Resume formatting and exporting
+│ │ ├── formatter.py
+│ │ └── export.py
+│ │
+│ └── utils/ # Helper utilities
+│ ├── file_handler.py
+│ ├── text_cleaner.py
+│ └── validator.py
 
-└── tests/
-    ├── test_parsers.py
-    ├── test_prompt_builder.py
-    └── test_resume_generator.py
+└── tests/ # Unit and integration tests
+├── test_parsers.py
+├── test_prompt_builder.py
+└── test_resume_generator.py
