@@ -1,0 +1,28 @@
+{
+  "education": "EDUCATION",
+  "experience": "2 years ",
+  "extraction_date": "2025-07-01 00:56:41",
+  "personal_info": {
+    "emails": [
+      "ruarunraj2013@gmail.com"
+    ],
+    "phones": []
+  },
+  "skills": {
+    "Soft Skills": [],
+    "Technical": [
+      "Python",
+      "Machine Learning"
+    ],
+    "Tools": [
+      "Power BI"
+    ]
+  },
+  "social_links": {
+    "github": [],
+    "linkedin": [
+      "linkedin.com/in/arunraj"
+    ]
+  },
+  "session_id": "20250701_005641_639291"
+}
