@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Resume Parser</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+        
+        .subtitle {
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+        
+        .upload-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .upload-box {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(72, 149, 239, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .result-container {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .result-title {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+        
+        .result-content {
+            margin-bottom: 2rem;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-title i {
+            margin-right: 0.5rem;
+        }
+        
+        .info-item {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-item i {
+            margin-right: 0.5rem;
+            color: var(--accent);
+        }
+        
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .skill-tag {
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        .download-success {
+            color: var(--success);
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message {
+            color: var(--danger);
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
+
+        /* New styles for editable fields */
+        .edit-form {
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .edit-btn {
+            background: var(--accent);
+            margin-left: auto;
+        }
+
+        .add-skill-btn {
+            background: var(--success);
+            margin-top: 0.5rem;
+        }
+
+        .remove-skill-btn {
+            background: var(--danger);
+            margin-left: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .edit-mode .view-mode {
+            display: none;
+        }
+
+        .edit-mode .edit-mode {
+            display: block;
+        }
+
+        .view-mode {
+            display: block;
+        }
+
+        .edit-mode {
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <h1>Smart Resume Parser</h1>
+            <p class="subtitle">Upload your resume and extract valuable information instantly</p>
+        </header>
+        
+        <div class="upload-container">
+            <div class="upload-box" id="dropZone">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h3>Drag & Drop your resume here</h3>
+                <p>or</p>
+                <input type="file" id="fileInput" accept=".pdf" style="display: none;">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-file-upload"></i> Select PDF File
+                </button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your resume...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="result-header">
+                <h2 class="result-title">
+                    <i class="fas fa-user-circle"></i> Extracted Information
+                </h2>
+                <div>
+                    <button class="btn edit-btn" id="editBtn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn" id="downloadBtn">
+                        <i class="fas fa-download"></i> Download JSON
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-content" id="resultContent">
+                <!-- Results will be inserted here by JavaScript -->
+            </div>
+
+            <div class="download-success" id="downloadSuccess">
+                <i class="fas fa-check-circle"></i> Download started successfully
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 Smart Resume Parser | Built with Flask & Python</p>
+    </footer>
+    
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const loading = document.getElementById('loading');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultContent = document.getElementById('resultContent');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const editBtn = document.getElementById('editBtn');
+        const downloadSuccess = document.getElementById('downloadSuccess');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        let currentSessionId = '';
+        let extractedData = {};
+        let isEditMode = false;
+
+        // Drag and drop functionality
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#4361ee';
+            dropZone.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#dee2e6';
+            dropZone.style.backgroundColor = 'transparent';
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#dee2e6';
+            dropZone.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileUpload();
+            }
+        });
+        
+        fileInput.addEventListener('change', handleFileUpload);
+        
+        // Handle file upload
+        async function handleFileUpload() {
+            if (!fileInput.files.length) return;
+            
+            const file = fileInput.files[0];
+            if (!file.name.endsWith('.pdf')) {
+                showError('Please upload a PDF file');
+                return;
+            }
+            
+            // Reset UI
+            hideError();
+            loading.style.display = 'block';
+            resultContainer.style.display = 'none';
+            downloadSuccess.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Upload failed');
+                }
+                
+                const data = await response.json();
+                
+                // Store the session ID and data
+                currentSessionId = data.session_id;
+                extractedData = {...data};
+                delete extractedData.session_id;
+                
+                displayResults(extractedData, false);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        // Display results in view or edit mode
+        function displayResults(data, editMode = false) {
+            resultContent.innerHTML = '';
+            isEditMode = editMode;
+            
+            // Personal Information
+            if (data.personal_info) {
+                const personalInfoHtml = `
+                    <div class="info-card">
+                        <h3 class="info-title"><i class="fas fa-user"></i> Personal Information</h3>
+                        
+                        <div class="view-mode">
+                            ${data.personal_info.emails?.length ? `
+                                <div class="info-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>${data.personal_info.emails.join(', ')}</span>
+                                </div>
+                            ` : ''}
+                            ${data.personal_info.phones?.length ? `
+                                <div class="info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>${data.personal_info.phones.join(', ')}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="edit-form edit-mode">
+                            <div class="form-group">
+                                <label for="emails">Email Addresses (comma separated)</label>
+                                <input type="text" id="emails" class="form-control" 
+                                    value="${data.personal_info.emails?.join(', ') || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label for="phones">Phone Numbers (comma separated)</label>
+                                <input type="text" id="phones" class="form-control" 
+                                    value="${data.personal_info.phones?.join(', ') || ''}">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultContent.innerHTML += personalInfoHtml;
+            }
+            
+            // Social Links
+            if (data.social_links) {
+                let socialLinksHtml = `
+                    <div class="info-card">
+                        <h3 class="info-title"><i class="fas fa-share-alt"></i> Social Links</h3>
+                        
+                        <div class="view-mode">
+                `;
+                
+                if (data.social_links.github?.length) {
+                    socialLinksHtml += `
+                        <div class="info-item">
+                            <i class="fab fa-github"></i>
+                            <span>${data.social_links.github.map(link => `github.com/${link}`).join(', ')}</span>
+                        </div>
+                    `;
+                }
+                
+                if (data.social_links.linkedin?.length) {
+                    socialLinksHtml += `
+                        <div class="info-item">
+                            <i class="fab fa-linkedin"></i>
+                            <span>${data.social_links.linkedin.map(link => `linkedin.com/in/${link}`).join(', ')}</span>
+                        </div>
+                    `;
+                }
+                
+                socialLinksHtml += `
+                        </div>
+                        
+                        <div class="edit-form edit-mode">
+                            <div class="form-group">
+                                <label for="github">GitHub Profiles (just usernames, comma separated)</label>
+                                <input type="text" id="github" class="form-control" 
+                                    value="${data.social_links.github?.join(', ') || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label for="linkedin">LinkedIn Profiles (just usernames, comma separated)</label>
+                                <input type="text" id="linkedin" class="form-control" 
+                                    value="${data.social_links.linkedin?.join(', ') || ''}">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultContent.innerHTML += socialLinksHtml;
+            }
+            
+            // Education
+            if (data.education) {
+                resultContent.innerHTML += `
+                    <div class="info-card">
+                        <h3 class="info-title"><i class="fas fa-graduation-cap"></i> Education</h3>
+                        
+                        <div class="view-mode">
+                            <p>${data.education}</p>
+                        </div>
+                        
+                        <div class="edit-form edit-mode">
+                            <div class="form-group">
+                                <label for="education">Education Details</label>
+                                <textarea id="education" class="form-control">${data.education || ''}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Experience
+            if (data.experience) {
+                resultContent.innerHTML += `
+                    <div class="info-card">
+                        <h3 class="info-title"><i class="fas fa-briefcase"></i> Experience</h3>
+                        
+                        <div class="view-mode">
+                            <p>${data.experience}</p>
+                        </div>
+                        
+                        <div class="edit-form edit-mode">
+                            <div class="form-group">
+                                <label for="experience">Experience Details</label>
+                                <input type="text" id="experience" class="form-control" 
+                                    value="${data.experience || ''}">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Skills
+            if (data.skills) {
+                let skillsHtml = `
+                    <div class="info-card">
+                        <h3 class="info-title"><i class="fas fa-code"></i> Skills</h3>
+                        
+                        <div class="view-mode">
+                `;
+                
+                for (const [category, skills] of Object.entries(data.skills)) {
+                    if (skills?.length) {
+                        skillsHtml += `
+                            <h4 style="margin: 1rem 0 0.5rem 0;">${category}</h4>
+                            <div class="skills-container">
+                                ${skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                            </div>
+                        `;
+                    }
+                }
+                
+                skillsHtml += `
+                        </div>
+                        
+                        <div class="edit-form edit-mode">
+                `;
+                
+                for (const [category, skills] of Object.entries(data.skills)) {
+                    skillsHtml += `
+                        <div class="form-group">
+                            <label for="skills-${category.toLowerCase().replace(' ', '-')}">${category} Skills (comma separated)</label>
+                            <input type="text" id="skills-${category.toLowerCase().replace(' ', '-')}" class="form-control" 
+                                value="${skills?.join(', ') || ''}">
+                        </div>
+                    `;
+                }
+                
+                skillsHtml += `
+                        </div>
+                    </div>
+                `;
+                resultContent.innerHTML += skillsHtml;
+            }
+            
+            // Extraction Date
+            if (data.extraction_date) {
+                resultContent.innerHTML += `
+                    <div class="info-item" style="margin-top: 1rem; color: #6c757d; font-size: 0.9rem;">
+                        <i class="far fa-clock"></i>
+                        <span>Extracted on: ${data.extraction_date}</span>
+                    </div>
+                `;
+            }
+            
+            // Add form actions in edit mode
+            if (editMode) {
+                resultContent.innerHTML += `
+                    <div class="form-actions">
+                        <button class="btn btn-outline" id="cancelEditBtn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button class="btn" id="saveChangesBtn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                `;
+                
+                // Add event listeners for edit mode buttons
+                document.getElementById('cancelEditBtn').addEventListener('click', () => {
+                    displayResults(extractedData, false);
+                    editBtn.style.display = 'inline-block';
+                });
+                
+                document.getElementById('saveChangesBtn').addEventListener('click', saveEditedData);
+            }
+            
+            // Toggle view/edit modes
+            const viewModes = resultContent.querySelectorAll('.view-mode');
+            const editModes = resultContent.querySelectorAll('.edit-mode');
+            
+            if (editMode) {
+                viewModes.forEach(el => el.style.display = 'none');
+                editModes.forEach(el => el.style.display = 'block');
+                editBtn.style.display = 'none';
+            } else {
+                viewModes.forEach(el => el.style.display = 'block');
+                editModes.forEach(el => el.style.display = 'none');
+                editBtn.style.display = 'inline-block';
+            }
+            
+            // Show results
+            resultContainer.style.display = 'block';
+        }
+        
+        // Edit button handler
+        editBtn.addEventListener('click', () => {
+            displayResults(extractedData, true);
+        });
+        
+        // Save edited data
+        async function saveEditedData() {
+            try {
+                // Collect edited data
+                const editedData = {
+                    ...extractedData,
+                    personal_info: {
+                        emails: document.getElementById('emails').value.split(',').map(e => e.trim()).filter(e => e),
+                        phones: document.getElementById('phones').value.split(',').map(p => p.trim()).filter(p => p)
+                    },
+                    social_links: {
+                        github: document.getElementById('github').value.split(',').map(g => g.trim()).filter(g => g),
+                        linkedin: document.getElementById('linkedin').value.split(',').map(l => l.trim()).filter(l => l)
+                    },
+                    education: document.getElementById('education').value,
+                    experience: document.getElementById('experience').value,
+                    skills: {}
+                };
+                
+                // Update skills
+                for (const category in extractedData.skills) {
+                    const inputId = `skills-${category.toLowerCase().replace(' ', '-')}`;
+                    const input = document.getElementById(inputId);
+                    if (input) {
+                        editedData.skills[category] = input.value.split(',').map(s => s.trim()).filter(s => s);
+                    }
+                }
+                
+                // Show loading
+                loading.style.display = 'block';
+                
+                // Send to backend
+                const response = await fetch('/save_edited', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...editedData,
+                        session_id: currentSessionId
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to save changes');
+                }
+                
+                const result = await response.json();
+                
+                // Update local data
+                extractedData = editedData;
+                currentFilename = result.download_filename;
+                
+                // Switch back to view mode
+                displayResults(extractedData, false);
+                
+                // Show success message
+                downloadSuccess.textContent = 'Changes saved successfully!';
+                downloadSuccess.style.display = 'block';
+                setTimeout(() => {
+                    downloadSuccess.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        // Download JSON
+        downloadBtn.addEventListener('click', async () => {
+            if (!currentFilename) {
+                showError('No file to download. Please upload a resume first.');
+                return;
+            }
+            
+            try {
+                // Show download confirmation
+                downloadSuccess.textContent = 'Download started successfully';
+                downloadSuccess.style.display = 'block';
+                setTimeout(() => {
+                    downloadSuccess.style.display = 'none';
+                }, 3000);
+                
+                // Trigger download
+                const link = document.createElement('a');
+                link.href = `/download/${currentFilename}`;
+                link.download = currentFilename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+            } catch (error) {
+                showError('Error downloading file: ' + error.message);
+            }
+        });
+
+        // Error handling
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
